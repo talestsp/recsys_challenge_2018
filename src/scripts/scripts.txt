@@ -1,1 +1,3 @@
 Scripts for processing data
+
+For data transformation scripts please use script input args for the input data path name and the output data path name to be created.
