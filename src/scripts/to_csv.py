@@ -3,6 +3,10 @@ import csv
 import os
 import sys
 
+#Script that transform data into three csvs (playlist data, track data and for linking them)
+#arg1: input data dir
+#arg2: output data dir
+
 
 def fix_path(path: object) -> object:
     base_path = os.getcwd()
