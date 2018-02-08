@@ -11,17 +11,16 @@ You can find more about the challenge [here](http://www.recsyschallenge.com/2018
 Você pode contribuir da forma que achar melhor, é **muitíssimo recomendado para a organização do projeto**
 que seguintes passos:
 
-1. Cheque o backlog do projeto e as demais tabelas que tem titúlo relacionado com a sua task.  
+1. Cheque o [backlog](https://docs.google.com/spreadsheets/d/1sWLoWOEsVdKcs909zruygCF536TNPqjvdw7sDaf3q1s/edit?usp=sharing) do projeto e as demais tabelas que tem titúlo relacionado com a sua task.  
     
-    1.1. Caso uma task similar já exista e não tenha dono: coloque na planilha que você é o responsável pela task.
+    1.1. Caso uma task similar a sua já exista e não tenha dono: coloque na planilha que você é o responsável pela task.
     
-    1.2. Caso uma task similar já exista e tenha dono: coloque na planilha que você também é responsável pela task e
+    1.2. Caso uma task similar a sua já exista e tenha dono: coloque na planilha que você também é responsável pela task e
     sincronize com os demais responsáveis (**é possível que já exista um canal no slack para discutir essa task**).
   
-    1.3. Se a task não existir crie no backlog, adicione que você é responsável e seja feliz :smile:!
+    1.3. Se uma task similar não existir crie no backlog, adicione que você é responsável e seja feliz :smile:!
 
-2.  Ao implementar sua task lembre é importante que os demais integrantes do grupo entendam
-**e possam reexecutar** seu código!
+2.  Ao implementar sua task lembre: é importante que os demais integrantes do grupo **entendam e possam reexecutar** seu código :heart: :heart: :heart: :heart: :heart: :heart: !
 
     2.1. Adicione um README contendo: O que faz o código? Como rodar? Algo mais que os demais deveriam saber?
   
@@ -34,6 +33,10 @@ que seguintes passos:
 ou repasse a alguém que poderá ir o que você fez e as dificuldades que encontrou.
 
 > Dúvidas? **Use o Slack!** Esse é nosso canal de comunicação oficial.
+
+### Quer contribuir, mas não sabe muito bem com o que pode ajudar?
+
+Uma ajuda muito útil é analisar e descrever os dados! Há várias tasks disponíveis [neste link](https://docs.google.com/spreadsheets/d/1sWLoWOEsVdKcs909zruygCF536TNPqjvdw7sDaf3q1s/edit?usp=sharing). (Se for implementar alguma das tasks siga o procedimento explicado acima)
 
 ## The Task
 
