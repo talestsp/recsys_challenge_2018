@@ -27,13 +27,16 @@ t_cols = ["artist_name", "track_uri", "artist_uri", "track_name", "album_uri", "
 p_t_cols = ["pid", "track_uri", "pos"]
 try:
     with open(output_data_dir + "playlists.csv", "w", encoding = 'utf-8') as p_out_file:
-        p_file = csv.writer(p_out_file, quotechar='', quoting=csv.QUOTE_NONE , lineterminator = '\n', delimiter=';', escapechar='\\')
+        p_file = csv.writer(p_out_file, quoting=csv.QUOTE_MINIMAL, lineterminator='\n', delimiter=';', escapechar='\\')
         p_file.writerow(p_cols)
         with open(output_data_dir + "tracks.csv", "w", encoding = 'utf-8') as t_out_file:
-            t_file = csv.writer(t_out_file, quotechar='', quoting=csv.QUOTE_NONE , lineterminator = '\n', delimiter=';', escapechar='\\')
+            t_file = csv.writer(t_out_file, quoting=csv.QUOTE_MINIMAL, lineterminator='\n', delimiter=';',
+                                escapechar='\\')
+
             t_file.writerow(t_cols)
             with open(output_data_dir + "play_track.csv", "w", encoding = 'utf-8') as p_t_out_file:
-                p_t_file = csv.writer(p_t_out_file, quotechar='', quoting=csv.QUOTE_NONE , lineterminator = '\n', delimiter=';', escapechar='\\')
+                p_t_file = csv.writer(p_t_out_file, quoting=csv.QUOTE_MINIMAL, lineterminator='\n', delimiter=';',
+                                      escapechar='\\')
                 p_t_file.writerow(p_t_cols)
                 for filename in os.listdir(input_data_dir):
                     if('.json' in filename):
