@@ -47,7 +47,17 @@ The task will be to predict the missing tracks in those playlists.
 
 ## The Dataset
 
-The dataset can be found [here](https://recsys-challenge.spotify.com/details).
+### Original dataset 
+It can be found [here](https://recsys-challenge.spotify.com/details).
+
+### Our processed dataset
+Three files (tracks_unique.csv, playlist.csv and play_track.csv)
+Can be found here [here](https://drive.google.com/drive/folders/1l1i6VuDQ-e6HTm2TK-fFYT60XzECodgd)
+
+You can also process the original dataset by yourself by running
+
+* src/scripts/**to_csv.py**
+* src/scripts/**csv_unique.sh**
 
 ### About the dataset
 
