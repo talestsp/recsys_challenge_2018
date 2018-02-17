@@ -104,4 +104,8 @@ ENV/
 
 
 .idea*
-data/*
+*.csv
+*.tar
+*.gz
+*.zip
+*.rar
