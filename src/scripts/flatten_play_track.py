@@ -8,11 +8,14 @@
 import pandas as pd
 import sys
 import gc
+import os
 
 SEP = ";"
 
 playtrack_csv_path = sys.argv[1]
 
+import time
+start = time.time()
 print("Loading play_track data...")
 playtrack = pd.read_csv(playtrack_csv_path, sep=";")
 del playtrack["pos"]
@@ -23,6 +26,9 @@ playtrack = playtrack.groupby("pid")["track_uri"].apply(lambda serie: serie.toli
 gc.collect()
 playtrack = playtrack.reset_index()
 playtrack = playtrack.sort_values("pid")
+
+end = time.time()
+print(end - start)
 
 print("Saving play_track_flat.csv")
 new_filename = "/".join(playtrack_csv_path.split("/")[0:-1]) + "/play_track_flat.csv"
