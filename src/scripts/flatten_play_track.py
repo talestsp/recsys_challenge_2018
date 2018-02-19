@@ -26,4 +26,4 @@ playtrack = playtrack.sort_values("pid")
 
 print("Saving play_track_flat.csv")
 new_filename = "/".join(playtrack_csv_path.split("/")[0:-1]) + "/play_track_flat.csv"
-playtrack.to_csv(new_filename, index=False)
+playtrack.to_csv(new_filename, index=False, sep=SEP)
