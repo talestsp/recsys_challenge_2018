@@ -32,8 +32,8 @@ SEP = ";"
 
 play_track_flat_csv_path = sys.argv[1]
 output_playlist_sim_dir = sys.argv[2]
-from_pid = 0
-to_pid = 3
+from_pid = sys.argv[3]
+to_pid = sys.argv[4]
 
 print("Loading play_track_flat data...")
 playtrack = pd.read_csv(play_track_flat_csv_path, sep=";")
