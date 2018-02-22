@@ -10,55 +10,67 @@
 import pandas as pd
 import sys
 import gc
-import multiprocessing
+import threading
 import time
 import math
 
-def jaccard(a, b, round_n=4):
-    '''
-    Rounded jaccard similarity
-    :param a: an array to be coerced to set
-    :param b: another array to be coerced to set
-    :param round_n: round n non integer digits
-    :return: jaccard distance
-    '''
-    set_a = set(a)
-    set_b = set(b)
-    return round(float(len(set_a.intersection(set_b))) / len(set_a.union(b)), round_n)
+import os
 
-def playlist_similarities(playlist, playtrack, jaccard_treshold=0.1):
-    '''
-    Calculates jaccard similarity between playlist and all playlists and saves it.
-    :param playlist: calculates distance from playlist to all playlists
-    :param playtrack: DataFrame of play_track.csv
-    :param jaccard_treshold:
-    '''
-    pid = playlist["pid"]
-    sims = playtrack.apply(lambda another_playlist:
-                   jaccard(playlist["track_uri"], another_playlist["track_uri"]),
-                    axis=1)
-    print("saving similars to pid:", pid)
-    sims.index.names = ["pid"]
-    #saving only similarities above jaccard_threshold
-    sims[sims > jaccard_treshold].to_csv(output_playlist_sim_dir + "pid--" + str(pid) + ".csv", sep=SEP)
+print(os.path.join(os.path.dirname(__file__), '..'))
+
+class PlaylistSimilarityBuilder(threading.Thread):
+    def __init__(self, playtrack, output_playlist_sim_dir, from_pid, to_pid):
+        threading.Thread.__init__(self)
+        self.playtrack = playtrack
+        self.output_playlist_sim_dir = output_playlist_sim_dir
+        self.from_pid = from_pid
+        self.to_pid = to_pid
 
 
-def calc_similarity_for_playlists(playtrack, from_pid, to_pid):
-    '''
-    It calculates similarity between each playlist inside a range and all playlists
-    :param playtrack: DataFrame of play_track.csv
-    :param from_pid:
-    :param to_pid:
-    :return:
-    '''
-    print("\n", id(playtrack), "\n")
-    print("Processing similarities...")
-    playtrack.loc[from_pid: to_pid].apply(playlist_similarities, playtrack=playtrack, axis=1)
+    def jaccard(self, a, b, round_n=4):
+        '''
+        Rounded jaccard similarity
+        :param a: an array to be coerced to set
+        :param b: another array to be coerced to set
+        :param round_n: round n non integer digits
+        :return: jaccard distance
+        '''
+        set_a = set(a)
+        set_b = set(b)
+        return round(float(len(set_a.intersection(set_b))) / len(set_a.union(b)), round_n)
+
+    def playlist_similarities(self, playlist, jaccard_treshold=0.1):
+        '''
+        Calculates jaccard similarity between the given playlist and all playlists and saves it.
+        :param playlist: calculates distance from playlist to all playlists
+        :param playtrack: DataFrame of play_track.csv
+        :param jaccard_treshold:
+        '''
+        pid = playlist["pid"]
+        sims = self.playtrack.apply(lambda another_playlist:
+                                    self.jaccard(playlist["track_uri"],
+                                    another_playlist["track_uri"]),
+                                    axis=1)
+        print("saving similars to pid:", pid)
+        sims.index.names = ["pid"]
+        #saving only similarities above jaccard_threshold
+        sims[sims > jaccard_treshold].to_csv(output_playlist_sim_dir + "pid--" + str(pid) + ".csv", sep=SEP)
 
 
-def build_multi_core_tasks(playtrack, n_cpus, from_pid, to_pid):
+    def run(self):
+        '''
+        It calculates similarity between each playlist inside a range and all playlists
+        :param playtrack: DataFrame of play_track.csv
+        :param from_pid: beginning of the playlist
+        :param to_pid: end of the playlist
+        '''
+        print("Processing similarities...")
+        self.playtrack.loc[self.from_pid: self.to_pid].apply(self.playlist_similarities, axis=1)
+
+
+def dataset_slices(from_pid, to_pid, n_threads):
     '''
-    Builds a list of task parameters to be applied to each CPU task
+    Builds a list of ranges that each thread will apply to dataset
     :param n_cpus: number of CPUs to be in parallelized
     :param playtrack: DataFrame of play_track.csv
     :param from_pid:
@@ -68,64 +80,65 @@ def build_multi_core_tasks(playtrack, n_cpus, from_pid, to_pid):
     range_len = to_pid - from_pid
     current_from_pid = from_pid
 
-    task_len = int(math.ceil(range_len / n_cpus))
-    task_parameters = []
+    dataset_range = int(math.ceil(range_len / n_threads))
+    ranges = []
 
-    #creates task for each CPU
-    #Attention: the last task will be made (complementary) out of this for due to deal with reamaining rounds
-    for i in range(n_cpus - 1):
-        current_to_pid = current_from_pid + task_len
-        task_parameters.append((playtrack,
-                                current_from_pid,
-                                current_to_pid))
+
+    for i in range(n_threads - 1):
+        current_to_pid = current_from_pid + dataset_range
+        ranges.append({"from_pid": current_from_pid,
+                       "to_pid": current_to_pid})
         current_from_pid = current_to_pid + 1
 
-    #create a task for the complementary missing rounds
-    task_parameters.append((playtrack,
-                            current_from_pid,
-                            to_pid))
-    return task_parameters
+    #create a task for the missing rounds
+    ranges.append({"from_pid": current_from_pid, "to_pid": to_pid})
+    return ranges
+
+
+
+def load_and_process_data(playtrack_csv_path):
+    print("Loading play_track data...")
+    playtrack = pd.read_csv(playtrack_csv_path, sep=";")
+    del playtrack["pos"]
+    gc.collect()
+
+    print("Transforming data...")
+    playtrack = playtrack.groupby("pid")["track_uri"].apply(lambda serie: serie.tolist())
+    gc.collect()
+    playtrack = pd.DataFrame(playtrack).reset_index()
+    playtrack = playtrack.set_index(playtrack["pid"])
+
+    return playtrack
+
 
 SEP = ";"
 
 # playtrack_csv_path = "/home/tales/dev/recsys_challenge_2018/data/play_track.csv"
 # output_playlist_sim_dir = "/home/tales/dev/recsys_challenge_2018/data/playlist_similarity/"
 
+##############
+# INPUTS
 playtrack_csv_path = sys.argv[1]
 output_playlist_sim_dir = sys.argv[2]
 from_pid = int(sys.argv[3])
 to_pid = int(sys.argv[4])
 try:
-    n_cpus = int(sys.argv[5])
+    n_threads = int(sys.argv[5])
 except IndexError:
-    n_cpus = 1
+    n_threads = 1
+##############
 
 start = time.time()
-
-print("Loading play_track data...")
-playtrack = pd.read_csv(playtrack_csv_path, sep=";")
-del playtrack["pos"]
-gc.collect()
-
-print("Transforming data...")
-playtrack = playtrack.groupby("pid")["track_uri"].apply(lambda serie: serie.tolist())
-gc.collect()
-playtrack = pd.DataFrame(playtrack).reset_index()
-playtrack = playtrack.set_index(playtrack["pid"])
-
+playtrack = load_and_process_data(playtrack_csv_path)
 end = time.time()
 print("Time (s) for loading and processing data: " + str(end - start))
 
 
-pool = multiprocessing.Pool(n_cpus)
-tasks_parameters = build_multi_core_tasks(playtrack, n_cpus, from_pid, to_pid)
+dataset_ranges = dataset_slices(from_pid, to_pid, n_threads)
 
-results = []
-for parameters in tasks_parameters:
-    results.append(pool.apply_async(calc_similarity_for_playlists, parameters))
-
-for result in results:
-    print(result.get())
-
+for dataset_range in dataset_ranges:
+    similarity_builder = PlaylistSimilarityBuilder(playtrack, output_playlist_sim_dir,
+                                                   dataset_range["from_pid"], dataset_range["to_pid"])
+    similarity_builder.start()
 
 
