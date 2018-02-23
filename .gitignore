@@ -109,3 +109,4 @@ ENV/
 *.gz
 *.zip
 *.rar
+execute.sh
