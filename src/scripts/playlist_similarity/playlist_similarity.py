@@ -30,9 +30,9 @@ def calc_similarity_for_playlists(all_playlists, playlist_sim_dir, from_pid=None
     '''
     It calculates similarity between each playlist inside a range and all playlists
     :param all_playlists: DataFrame of play_track.csv
+    :param playlist_sim_dir: path to save playlist's similarity
     :param from_pid: start value of the pids range
     :param to_pid: end value of the pids range
-    :return:
     '''
     print("all_playlists object id {}".format(id(all_playlists)))
     print("Processing similarities...")

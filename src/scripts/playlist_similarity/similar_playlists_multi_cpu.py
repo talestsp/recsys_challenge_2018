@@ -21,6 +21,7 @@ def process_parameters(all_playlists, n_cpus, playlist_sim_dir, from_pid, to_pid
     Builds a list of parameters to be applied to each CPU task
     :param n_cpus: number of CPUs to be in parallelized
     :param all_playlists: DataFrame of play_track.csv
+    :param playlist_sim_dir: path to save playlist's similarity
     :param from_pid:
     :param to_pid:
     :return:
