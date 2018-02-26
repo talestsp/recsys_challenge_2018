@@ -2,17 +2,11 @@ import json
 import csv
 import os
 import sys
+from src.utils.path import fix_path
 
 #Script that transform original data into three csvs (playlist data, track data and for linking them)
 #arg1: input data dir
 #arg2: output data dir
-
-
-def fix_path(path: object) -> object:
-	base_path = os.getcwd()
-	path = os.path.join(base_path, path)
-	path = os.path.abspath(os.path.realpath(path)) + "/"
-	return path
 
 input_data_dir = sys.argv[1]
 output_data_dir = sys.argv[2]
