@@ -110,3 +110,4 @@ ENV/
 *.zip
 *.rar
 execute.sh
+similarity_config.json
