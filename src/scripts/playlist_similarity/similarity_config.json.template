@@ -1,3 +1,7 @@
 {
-
+    "playtrack_csv_path" : null,
+    "playlist_sim_dir" : null,
+    "from_pid" : null,
+    "to_pid" : null,
+    "n_cpus" : null
 }

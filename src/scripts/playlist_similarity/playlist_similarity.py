@@ -10,7 +10,7 @@ def jaccard(a, b, round_n=4):
     set_b = set(b)
     return round(float(len(set_a.intersection(set_b))) / len(set_a.union(b)), round_n)
 
-def playlist_vs_all(playlist, all_playlists, playlist_sim_dir, jaccard_treshold=0.1, sep=";"):
+def playlist_vs_all(playlist, all_playlists, playlist_sim_dir, top_similars=16, sep=";"):
     '''
     Calculates jaccard similarity between playlist and all playlists and saves it.
     Saves a data frame with two columns: pids from playlists and their similarity with self.playlist.
@@ -22,11 +22,11 @@ def playlist_vs_all(playlist, all_playlists, playlist_sim_dir, jaccard_treshold=
         lambda another_playlist:
         jaccard(playlist["track_uri"], another_playlist["track_uri"]), axis=1)
 
-    print("pid:", playlist["pid"])
     sims.index.names = ["pid"]
-    sims[sims > jaccard_treshold].to_csv(playlist_sim_dir + "pid--" + str(playlist["pid"]) + ".csv", sep=sep)
+    sims = sims.sort_values(ascending=False).head(top_similars)
+    sims.to_csv(playlist_sim_dir + "pid--" + str(playlist["pid"]) + ".csv", sep=sep)
 
-def calc_similarity_for_playlists(all_playlists, playlist_sim_dir, from_pid=None, to_pid=None):
+def calc_similarity_for_playlists(all_playlists, playlist_sim_dir, pids):
     '''
     It calculates similarity between each playlist inside a range and all playlists
     :param all_playlists: DataFrame of play_track.csv
@@ -34,9 +34,8 @@ def calc_similarity_for_playlists(all_playlists, playlist_sim_dir, from_pid=None
     :param from_pid: start value of the pids range
     :param to_pid: end value of the pids range
     '''
-    print("all_playlists object id {}".format(id(all_playlists)))
     print("Processing similarities...")
-    all_playlists.loc[from_pid: to_pid].apply(playlist_vs_all,
+    all_playlists.loc[pids].apply(playlist_vs_all,
                                               all_playlists=all_playlists,
                                               playlist_sim_dir=playlist_sim_dir,
                                               axis=1)
