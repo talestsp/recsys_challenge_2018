@@ -1,6 +1,0 @@
-{
-    "playtrack_csv_path" : "/home/tales/dev/recsys_challenge_2018/data/play_track.csv",
-    "playlist_sim_dir" : "/home/tales/dev/recsys_challenge_2018/data/playlist_similarity/",
-    "pids": [11, 54321, 999999, 1564, 2105],
-    "n_cpus" : 2
-}
