@@ -38,6 +38,7 @@ def calc_similarity_for_playlists(all_playlists, playlist_sim_dir, pids, similar
     :param all_playlists: A dict where the key is the pid and the value is the song_id list
     :param playlist_sim_dir: path to save playlist's similarity
     :param pids: playlist ids to be calculed to all playlists
+    :param simlarity_metric: name of the metric to be used to calculate similarity
     '''
 
     print("Calculating {}...".format(similarity_metric))
