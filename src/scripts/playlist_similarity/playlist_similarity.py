@@ -24,6 +24,7 @@ def playlist_vs_all(playlist, all_playlists, playlist_sim_dir, top_similars=16, 
 
     sims.index.names = ["pid"]
     sims = sims.sort_values(ascending=False).head(top_similars)
+    print("Saving pid:", playlist["pid"])
     sims.to_csv(playlist_sim_dir + "pid--" + str(playlist["pid"]) + ".csv", sep=sep)
 
 def calc_similarity_for_playlists(all_playlists, playlist_sim_dir, pids):

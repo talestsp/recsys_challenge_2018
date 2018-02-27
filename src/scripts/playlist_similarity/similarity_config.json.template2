@@ -1,7 +1,6 @@
 {
     "playtrack_csv_path" : null,
     "playlist_sim_dir" : null,
-    "from_pid" : null,
-    "to_pid" : null,
+    "pids": [11, 54321, 999999, 1564, 2105]
     "n_cpus" : null
 }

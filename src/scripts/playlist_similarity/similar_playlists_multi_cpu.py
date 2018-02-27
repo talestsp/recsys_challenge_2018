@@ -120,12 +120,7 @@ config = load_config(config_path)
 
 playtrack_csv_path = config["playtrack_csv_path"]
 playlist_sim_dir = config["playlist_sim_dir"]
-from_pid = config["from_pid"]
-to_pid = config["to_pid"]
 n_cpus = config["n_cpus"]
-
-print("\n\n", config, "\n\n")
-
 #####################
 
 start = time.time()
