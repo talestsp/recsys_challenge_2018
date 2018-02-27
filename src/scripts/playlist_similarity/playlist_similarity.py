@@ -32,7 +32,7 @@ def pick_similarity_metric(metric_name):
     elif metric_name == PERCENTUAL_INTERSEC:
         return percentual_intersec
 
-def calc_similarity_for_playlists(all_playlists, playlist_sim_dir, pids, similarity_metric="jaccard", top_similars=21, sep=";"):
+def calc_similarity_for_playlists(all_playlists, playlist_sim_dir, pids, similarity_metric, top_similars=21, sep=";"):
     '''
     It calculates similarity between each playlist inside a range and all playlists
     :param all_playlists: A dict where the key is the pid and the value is the song_id list

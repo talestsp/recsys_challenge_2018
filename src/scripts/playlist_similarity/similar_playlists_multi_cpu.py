@@ -56,7 +56,8 @@ def process_parameters(all_playlists, n_cpus, playlist_sim_dir, pids, simlarity_
     use_pids = pids[to_index : len(pids)]
     task_parameters.append((all_playlists,
                             playlist_sim_dir,
-                            use_pids))
+                            use_pids,
+                            simlarity_metric))
     return task_parameters
 
 def load_and_transform_data(playtrack_csv_path):
