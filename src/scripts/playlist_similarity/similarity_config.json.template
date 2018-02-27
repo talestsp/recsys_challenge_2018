@@ -3,5 +3,6 @@
     "playlist_sim_dir" : null,
     "from_pid" : null,
     "to_pid" : null,
-    "n_cpus" : null
+    "n_cpus" : null,
+    "simlarity_metric": "percentual_intersec"
 }
