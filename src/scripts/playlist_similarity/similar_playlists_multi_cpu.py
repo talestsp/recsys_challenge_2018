@@ -1,11 +1,7 @@
 # This script generates for each playlist a table with the most similar playlists
 
 # INPUTS
-# arg1: play_track.csv path
-# arg2: path to playlists similarity dir
-# arg3: from pid
-# arg4: to pid
-# arg5 (optional; default n_cpus=1): number of CPUs to be used on parallelism
+# arg1: path to similar playlists config file
 
 import pandas as pd
 import sys
@@ -105,9 +101,9 @@ def load_and_transform_data(playtrack_csv_path):
 
     print("Transforming data...")
     playtrack = playtrack.groupby("pid")["track_uri"].apply(lambda serie: serie.tolist())
-    gc.collect()
     playtrack = pd.DataFrame(playtrack).reset_index()
     playtrack = playtrack.set_index(playtrack["pid"])
+    gc.collect()
     return playtrack
 
 
@@ -129,7 +125,6 @@ all_playlists = load_and_transform_data(playtrack_csv_path)
 
 end = time.time()
 print("Time (s) for loading and processing data: " + str(end - start))
-
 
 pool = multiprocessing.Pool(n_cpus)
 tasks_parameters = process_parameters(all_playlists, n_cpus, playlist_sim_dir, config["pids"])
