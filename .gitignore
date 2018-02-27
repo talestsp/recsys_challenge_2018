@@ -110,3 +110,5 @@ ENV/
 *.zip
 *.rar
 execute.sh
+.ipynb_checkpoints
+

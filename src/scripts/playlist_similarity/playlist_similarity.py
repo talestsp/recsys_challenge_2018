@@ -1,3 +1,8 @@
+import pandas as pd
+
+JACCARD = "jaccard"
+PERCENTUAL_INTERSEC = "percentual_intersec"
+
 def jaccard(a, b, round_n=4):
     '''
     Rounded jaccard similarity
@@ -10,33 +15,42 @@ def jaccard(a, b, round_n=4):
     set_b = set(b)
     return round(float(len(set_a.intersection(set_b))) / len(set_a.union(b)), round_n)
 
-def playlist_vs_all(playlist, all_playlists, playlist_sim_dir, jaccard_treshold=0.1, sep=";"):
+def percentual_intersec(a, b, round_n=4):
     '''
-    Calculates jaccard similarity between playlist and all playlists and saves it.
-    Saves a data frame with two columns: pids from playlists and their similarity with self.playlist.
-    :param jaccard_treshold: return data frame with only similoarities above this treshold
-    :param playlist_sim_dir: path to similarity playlists directory
+    Returns a proportion of how many elements from a are in b
+    :param a: an array to be coerced to set
+    :param b: another array to be coerced to set
+    :param round_n: round n non integer digits
     '''
+    set_a = set(a)
+    set_b = set(b)
+    return round(float(len(set_a.intersection(set_b))) / len(set_a), round_n)
 
-    sims = all_playlists.apply(
-        lambda another_playlist:
-        jaccard(playlist["track_uri"], another_playlist["track_uri"]), axis=1)
+def pick_similarity_metric(metric_name):
+    if metric_name == JACCARD:
+        return jaccard
+    elif metric_name == PERCENTUAL_INTERSEC:
+        return percentual_intersec
 
-    print("pid:", playlist["pid"])
-    sims.index.names = ["pid"]
-    sims[sims > jaccard_treshold].to_csv(playlist_sim_dir + "pid--" + str(playlist["pid"]) + ".csv", sep=sep)
-
-def calc_similarity_for_playlists(all_playlists, playlist_sim_dir, from_pid=None, to_pid=None):
+def calc_similarity_for_playlists(all_playlists, playlist_sim_dir, pids, similarity_metric, top_similars=21, sep=";"):
     '''
     It calculates similarity between each playlist inside a range and all playlists
-    :param all_playlists: DataFrame of play_track.csv
+    :param all_playlists: A dict where the key is the pid and the value is the song_id list
     :param playlist_sim_dir: path to save playlist's similarity
-    :param from_pid: start value of the pids range
-    :param to_pid: end value of the pids range
+    :param pids: playlist ids to be calculed to all playlists
+    :param simlarity_metric: name of the metric to be used to calculate similarity
     '''
-    print("all_playlists object id {}".format(id(all_playlists)))
-    print("Processing similarities...")
-    all_playlists.loc[from_pid: to_pid].apply(playlist_vs_all,
-                                              all_playlists=all_playlists,
-                                              playlist_sim_dir=playlist_sim_dir,
-                                              axis=1)
+
+    print("Calculating {}...".format(similarity_metric))
+    similarity = pick_similarity_metric(similarity_metric)
+
+    for a_pid in pids:
+        pids = []
+        for another_pid in all_playlists.keys():
+            sim = similarity(all_playlists[a_pid], all_playlists[another_pid])
+            pids.append({"pid": a_pid, "similar_pid": another_pid, similarity_metric: sim})
+
+        print("Saving pid:", a_pid)
+
+        pids_df = pd.DataFrame(pids).sort_values(similarity_metric, ascending=False).head(top_similars)
+        pids_df.to_csv(playlist_sim_dir + str(a_pid) + ".csv", index=False, sep=sep)

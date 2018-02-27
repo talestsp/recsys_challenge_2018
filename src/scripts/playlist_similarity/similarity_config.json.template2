@@ -1,0 +1,7 @@
+{
+    "playtrack_csv_path" : null,
+    "playlist_sim_dir" : null,
+    "pids": [11, 54321, 999999, 1564, 2105],
+    "n_cpus" : null,
+    "simlarity_metric": "percentual_intersec"
+}
