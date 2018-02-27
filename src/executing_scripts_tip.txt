@@ -1,0 +1,6 @@
+You probably want to run any script from command line without an IDE.
+If you face problems on imports please run your script with PYTHONPATH=.:src before your command.
+
+EXAMPLE:
+
+PYTHONPATH=.:src python src/scripts/playlist_similarity/similar_playlists_multi_cpu.py src/scripts/playlist_similarity/metric_experiment/percentual_intersec_config.json
