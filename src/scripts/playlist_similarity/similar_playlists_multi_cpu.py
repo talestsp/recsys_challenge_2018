@@ -24,55 +24,20 @@ def load_config(config_path):
 
     return config
 
-# def process_parameters(all_playlists, n_cpus, playlist_sim_dir, from_pid, to_pid):
-#     '''
-#     Builds a list of parameters to be applied to each CPU task
-#     :param n_cpus: number of CPUs to be in parallelized
-#     :param all_playlists: DataFrame of play_track.csv
-#     :param playlist_sim_dir: path to save playlist's similarity
-#     :param from_pid:
-#     :param to_pid:
-#     :return:
-#     '''
-#     range_len = to_pid - from_pid
-#     current_from_pid = from_pid
-#
-#     task_len = int(math.ceil(range_len / n_cpus))
-#     task_parameters = []
-#
-#     #creates task for each CPU
-#     #Attention: the last task will be made (complementary) out of this for due to deal with reamaining rounds
-#     for i in range(n_cpus - 1):
-#         current_to_pid = current_from_pid + task_len
-#         task_parameters.append((all_playlists,
-#                                 playlist_sim_dir,
-#                                 current_from_pid,
-#                                 current_to_pid))
-#         current_from_pid = current_to_pid + 1
-#
-#     #create a task for the complementary missing rounds
-#     task_parameters.append((all_playlists,
-#                             playlist_sim_dir,
-#                             current_from_pid,
-#                             to_pid))
-#     return task_parameters
-
-def process_parameters(all_playlists, n_cpus, playlist_sim_dir, pids):
+def process_parameters(all_playlists, n_cpus, playlist_sim_dir, pids, simlarity_metric):
     '''
     Builds a list of parameters to be applied to each CPU task
     :param n_cpus: number of CPUs to be in parallelized
     :param all_playlists: DataFrame of play_track.csv
     :param playlist_sim_dir: path to save playlist's similarity
-    :param from_pid:
-    :param to_pid:
+    :param pids: playlist ids to be calculed to all playlists
+    :param simlarity_metric: name of the metric to be used to calculate similarity
     :return:
     '''
     range_len = len(pids)
     task_len = int(math.floor(range_len / n_cpus))
     task_parameters = []
 
-    #creates task for each CPU
-    #Attention: the last task will be made (complementary) out of this for due to deal with reamaining rounds
     for i in range(n_cpus - 1):
         from_index = i * task_len
         to_index = (i + 1) * task_len
@@ -80,7 +45,8 @@ def process_parameters(all_playlists, n_cpus, playlist_sim_dir, pids):
         use_pids = pids[from_index : to_index]
         task_parameters.append((all_playlists,
                                 playlist_sim_dir,
-                                use_pids))
+                                use_pids,
+                                simlarity_metric))
 
     #there is no previous loop for n_cpus = 1
     if n_cpus == 1:
@@ -103,32 +69,27 @@ def load_and_transform_data(playtrack_csv_path):
     playtrack = playtrack.groupby("pid")["track_uri"].apply(lambda serie: serie.tolist())
     playtrack = pd.DataFrame(playtrack).reset_index()
     playtrack = playtrack.set_index(playtrack["pid"])
-    gc.collect()
-    return playtrack
-
+    return playtrack.to_dict()["track_uri"]
 
 SEP = ";"
-
 
 ### SCRIPT INPUTS ###
 config_path = fix_path(sys.argv[1], is_dir=False)
 config = load_config(config_path)
 
-playtrack_csv_path = config["playtrack_csv_path"]
-playlist_sim_dir = config["playlist_sim_dir"]
+playtrack_csv_path = fix_path(config["playtrack_csv_path"], is_dir=False)
+playlist_sim_dir = fix_path(config["playlist_sim_dir"])
 n_cpus = config["n_cpus"]
 #####################
 
 start = time.time()
-
 all_playlists = load_and_transform_data(playtrack_csv_path)
-
 end = time.time()
-print("Time (s) for loading and processing data: " + str(end - start))
+gc.collect()
+print("Time (s) for loading and processing data: " + str(round(end - start, 4)))
 
 pool = multiprocessing.Pool(n_cpus)
-tasks_parameters = process_parameters(all_playlists, n_cpus, playlist_sim_dir, config["pids"])
-
+tasks_parameters = process_parameters(all_playlists, n_cpus, playlist_sim_dir, config["pids"], config["simlarity_metric"])
 results = []
 for parameters in tasks_parameters:
     results.append(pool.apply_async(calc_similarity_for_playlists, parameters))
