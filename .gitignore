@@ -111,4 +111,5 @@ ENV/
 *.rar
 execute.sh
 .ipynb_checkpoints
+*config.json
 
